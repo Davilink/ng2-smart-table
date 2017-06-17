@@ -5,18 +5,19 @@ import { DataSource } from './lib/data-source/data-source';
 import { Row } from './lib/data-set/row';
 import { deepExtend } from './lib/helpers';
 import { LocalDataSource } from './lib/data-source/local/local.data-source';
+import { SEntity } from "lib/typings";
 
 @Component({
   selector: 'ng2-smart-table',
   styleUrls: ['./ng2-smart-table.component.scss'],
   templateUrl: './ng2-smart-table.component.html',
 })
-export class Ng2SmartTableComponent implements OnChanges {
+export class Ng2SmartTableComponent<T extends SEntity> implements OnChanges {
 
-  @Input() source: any;
+  @Input() source: DataSource<T>;
   @Input() settings: Object = {};
 
-  @Output() rowSelect = new EventEmitter<any>();
+  @Output() rowSelect = new EventEmitter<DataEvent>();
   @Output() userRowSelect = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() edit = new EventEmitter<any>();
@@ -154,7 +155,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.grid.onSelectRow().subscribe((row) => this.emitSelectRow(row));
   }
 
-  prepareSource(): DataSource {
+  prepareSource(): DataSource<T> {
     if (this.source instanceof DataSource) {
       return this.source;
     } else if (this.source instanceof Array) {

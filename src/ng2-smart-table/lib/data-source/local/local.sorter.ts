@@ -1,3 +1,5 @@
+import { SEntity } from "lib/typings";
+
 export class LocalSorter {
 
   protected static COMPARE = (direction: any, a: any, b: any) => {
@@ -10,7 +12,7 @@ export class LocalSorter {
     return 0;
   }
 
-  static sort(data: Array<any>, field: string, direction: string, customCompare?: Function): Array<any> {
+  static sort<T extends SEntity>(data: Array<T>, field: string, direction: string, customCompare?: Function): Array<T> {
 
     const dir: number = (direction === 'asc') ? 1 : -1;
     const compare: Function = customCompare ? customCompare : this.COMPARE;

@@ -1,87 +1,88 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { SEntity, FilterFieldConfig } from 'lib/typings';
 
-export abstract class DataSource {
+export abstract class DataSource<T extends SEntity> {
 
-  protected onChangedSource = new Subject<any>();
-  protected onAddedSource = new Subject<any>();
-  protected onUpdatedSource = new Subject<any>();
-  protected onRemovedSource = new Subject<any>();
+  protected onChangedSource = new Subject<T>();
+  protected onAddedSource = new Subject<T>();
+  protected onUpdatedSource = new Subject<T>();
+  protected onRemovedSource = new Subject<T>();
 
-  abstract getAll(): Promise<any>;
-  abstract getElements(): Promise<any>;
-  abstract getSort(): any;
-  abstract getFilter(): any;
-  abstract getPaging(): any;
+  abstract getAll(): Promise<T>;
+  abstract getElements(): Promise<T[]>;
+  abstract getSort(): T;
+  abstract getFilter(): T;
+  abstract getPaging(): T;
   abstract count(): number;
 
   refresh() {
     this.emitOnChanged('refresh');
   }
 
-  load(data: Array<any>): Promise<any> {
+  load(data: Array<T>): Promise<void> {
     this.emitOnChanged('load');
     return Promise.resolve();
   }
 
-  onChanged(): Observable<any> {
+  onChanged(): Observable<T> {
     return this.onChangedSource.asObservable();
   }
 
-  onAdded(): Observable<any> {
+  onAdded(): Observable<T> {
     return this.onAddedSource.asObservable();
   }
 
-  onUpdated(): Observable<any> {
+  onUpdated(): Observable<T> {
     return this.onUpdatedSource.asObservable();
   }
 
-  onRemoved(): Observable<any> {
+  onRemoved(): Observable<T> {
     return this.onRemovedSource.asObservable();
   }
 
-  prepend(element: any): Promise<any> {
+  prepend(element: T): Promise<void> {
     this.emitOnAdded(element);
     this.emitOnChanged('prepend');
     return Promise.resolve();
   }
 
-  append(element: any): Promise<any> {
+  append(element: T): Promise<void> {
     this.emitOnAdded(element);
     this.emitOnChanged('append');
     return Promise.resolve();
   }
 
-  add(element: any): Promise<any> {
+  add(element: T): Promise<void> {
     this.emitOnAdded(element);
     this.emitOnChanged('add');
     return Promise.resolve();
   }
 
-  remove(element: any): Promise<any> {
+  remove(element: T): Promise<void> {
     this.emitOnRemoved(element);
     this.emitOnChanged('remove');
     return Promise.resolve();
   }
 
-  update(element: any, values: any): Promise<any> {
+  update(element: T, values: T): Promise<void> {
     this.emitOnUpdated(element);
     this.emitOnChanged('update');
     return Promise.resolve();
   }
 
-  empty(): Promise<any> {
+  empty(): Promise<void> {
     this.emitOnChanged('empty');
     return Promise.resolve();
   }
 
-  setSort(conf: Array<any>, doEmit?: boolean) {
+  setSort(conf: Array<T>, doEmit?: boolean) {
     if (doEmit) {
       this.emitOnChanged('sort');
     }
   }
 
-  setFilter(conf: Array<any>, andOperator?: boolean, doEmit?: boolean) {
+  setFilter(conf: Array<FilterFieldConfig>, andOperator?: boolean, doEmit?: boolean) {
     if (doEmit) {
       this.emitOnChanged('filter');
     }
@@ -105,15 +106,15 @@ export abstract class DataSource {
     }
   }
 
-  protected emitOnRemoved(element: any) {
+  protected emitOnRemoved(element: T) {
     this.onRemovedSource.next(element);
   }
 
-  protected emitOnUpdated(element: any) {
+  protected emitOnUpdated(element: T) {
     this.onUpdatedSource.next(element);
   }
 
-  protected emitOnAdded(element: any) {
+  protected emitOnAdded(element: T) {
     this.onAddedSource.next(element);
   }
 
